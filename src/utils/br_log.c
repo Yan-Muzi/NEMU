@@ -37,7 +37,15 @@ struct br_info br_log[CONFIG_BR_LOG_SIZE];
 uint64_t br_count = 0;
 int br_overflow = 0;
 
+FILE *br_log_file = NULL;
+
 void br_log_commit(vaddr_t pc, vaddr_t target, int taken, int type) {
+  if (!br_log_file) {
+    br_log_file = fopen("branch_log.csv", "w");
+    fprintf(br_log_file, "pc, target, taken, type\n");
+  }
+  fprintf(br_log_file, "0x%lx, 0x%lx, %d, %d\n", pc, target, taken, type);
+
   br_log[br_count].pc = pc; // cpu.pc - 4;
   br_log[br_count].target = target;
   br_log[br_count].taken = taken;
